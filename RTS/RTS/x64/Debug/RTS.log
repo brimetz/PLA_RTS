@@ -1,0 +1,4 @@
+﻿  RTS.cpp
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\RTS.cpp(153,50): warning C4244: 'argument' : conversion de 'float' en 'int', perte possible de données
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\RTS.cpp(153,26): warning C4244: 'argument' : conversion de 'float' en 'int', perte possible de données
+  RTS.vcxproj -> C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\x64\Debug\RTS.exe
