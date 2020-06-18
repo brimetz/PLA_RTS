@@ -3,28 +3,16 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "raylib.h"
 #include "Vec2.h"
+#include "Define.h"
+#include "Map.h"
+#include "Unit.h"
+#include "Node.h"
 
-#define SCREENWIDTH 800
-#define SCREENHEIGHT 450
-
-#define CURSORRADIUS 20
-
-#define SIZEMAP 5
-#define SIZECASE 100
-
-enum class State
-{
-	WALKABLE,
-	OBSTACLE
-};
-
-struct Case
-{
-	State state = State::WALKABLE;
-};
+#include "SoundManager.h"
 
 void GestionCamera(Camera2D& camera, Vector2& CursorCamPos, Vector2& OldCursorCamPos)
 {
@@ -50,21 +38,28 @@ void GestionCamera(Camera2D& camera, Vector2& CursorCamPos, Vector2& OldCursorCa
 		CursorCamPos = OldCursorCamPos;
 		camera.target.y--;
 	}
-}
 
-void MoveIA(Camera2D& camera, Vector2& CursorCamPos, QXvec2& IAGoalPos, QXvec2& IAPos)
-{
-	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-	{
-		IAGoalPos = { CursorCamPos.x + camera.target.x, CursorCamPos.y + camera.target.y };
-	}
 
-	if ((IAGoalPos - IAPos).Length() > 10)
-		IAPos = IAPos + (IAGoalPos - IAPos).Normalize() * 10;
+	// TODO : A debug, Cercle ne suit pas la souris
+	camera.zoom += ((float)GetMouseWheelMove() * 0.05f);
+
+	if (camera.zoom > 2.0f) 
+		camera.zoom = 2.0f;
+	else if (camera.zoom < 0.5f) 
+		camera.zoom = 0.5f;
 }
 
 int main()
 {
+	InitAudioDevice();              // Initialize audio device
+
+	SoundManager soundManager;
+	soundManager.AddMusicAmbients("resources/musics/bad-romance.mp3");
+	soundManager.AddMusicAmbients("resources/musics/take-on-me.mp3");
+	soundManager.AddMusicAmbients("resources/musics/what-is-love.mp3");
+	soundManager.AddMusicAmbients("resources/musics/metallica-seek-destroy.mp3");
+	soundManager.AddMusicAmbients("resources/musics/i-want-to-break-free.mp3");
+
 	InitWindow(SCREENWIDTH, SCREENHEIGHT, "RTS starting Window");
 
 	SetTargetFPS(60);
@@ -79,24 +74,27 @@ int main()
 	camera.rotation = 0.0f;
 	camera.zoom = 1.0f;
 
-	QXvec2 IAPos = { 150,150 };
-	QXvec2 IAvecDir = { 0,0 };
-	QXvec2 IAGoalPos = { 150,150 };
+	Unit unit;
+	Map map;
 
 	bool collision = false;
 
-	Case cases[SIZEMAP * SIZEMAP];
+
+	for (int i = 0; i < SIZEMAP * SIZEMAP; i++)
+		map.cases.push_back(Node());
 
 	while (!WindowShouldClose())
 	{
+		soundManager.Update();
+
 		// ======Camera=========
 		GestionCamera(camera, CursorCamPos, OldCursorCamPos);
 		// ====================
 
 		// DEplacement de L'IA
-		MoveIA(camera, CursorCamPos, IAGoalPos, IAPos);
+		unit.MoveAI(camera, CursorCamPos, map);
 
-		bool collision = false;
+		bool collision = false; int temp = -1;
 		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
 		{
 			for (int i = 0; i < SIZEMAP; i++)
@@ -104,22 +102,26 @@ int main()
 				for (int j = 0; j < SIZEMAP; j++)
 				{
 					Rectangle rec = { (float)i * SIZECASE, (float)j * SIZECASE, SIZECASE, SIZECASE };
-					Vector2 point = { CursorCamPos.x + camera.target.x, CursorCamPos.y + camera.target.y };
+					Vector2 point = { CursorCamPos.x / camera.zoom + camera.target.x, CursorCamPos.y / camera.zoom + camera.target.y };
 					if (CheckCollisionPointRec(point, rec))
 					{
 						collision = true;
-						if (cases[i * j].state == State::OBSTACLE)
-							cases[i * j].state = State::WALKABLE;
-						else
-						{
-							cases[i * j].state = State::OBSTACLE;
-							std::cout << "stter obstacle" << std::endl;
-						}
+						temp = i * SIZEMAP + j;
 						break;
 					}
 				}
 				if (collision)
 					break;
+			}
+
+			if (temp >= 0)
+			{
+				if (map.cases[temp].state == State::OBSTACLE)
+					map.cases[temp].state = State::WALKABLE;
+				else
+				{
+					map.cases[temp].state = State::OBSTACLE;
+				}
 			}
 		}
 
@@ -130,33 +132,21 @@ int main()
 		ClearBackground(RAYWHITE);
 
 		BeginMode2D(camera);
-		DrawCircleV({ CursorCamPos.x + camera.target.x, CursorCamPos.y + camera.target.y}, CURSORRADIUS, CursorColor);
+		DrawCircleV({ CursorCamPos.x / camera.zoom + camera.target.x, CursorCamPos.y / camera.zoom + camera.target.y }, CURSORRADIUS, CursorColor);
 
-			//DrawRectangleLines
-			DrawText("move ball with mouse and click mouse button to change color", 10, 10, 20, DARKGRAY);
+		map.Draw();
+		
+		unit.Draw();
 
-			
-			for (int i = 0; i < SIZEMAP; i++)
-			{
-				for (int j = 0; j < SIZEMAP; j++)
-				{
-					Case tmp = cases[i * j];
-					if (tmp.state == State::WALKABLE)
-						DrawRectangleLines(i * SIZECASE, j * SIZECASE, SIZECASE, SIZECASE, MAROON);
-					else
-					{
-						DrawRectangle(i * SIZECASE, j * SIZECASE, SIZECASE, SIZECASE, BLACK);
-					}
-				}
-			}
-
-			DrawRectangle(IAPos.x - SIZECASE / 4, IAPos.y - SIZECASE / 4, SIZECASE/2, SIZECASE/2, GREEN);
-
-			EndMode2D();
+		EndMode2D();
 		EndDrawing();
 		// ========
 		OldCursorCamPos = CursorCamPos;
 	}
+
+	soundManager.Close();
+
+	CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------

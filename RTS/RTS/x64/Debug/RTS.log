@@ -1,4 +1,12 @@
-﻿  RTS.cpp
-C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\RTS.cpp(153,50): warning C4244: 'argument' : conversion de 'float' en 'int', perte possible de données
-C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\RTS.cpp(153,26): warning C4244: 'argument' : conversion de 'float' en 'int', perte possible de données
+﻿  Map.cpp
+  Node.cpp
+  RTS.cpp
+  Unit.cpp
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\Unit.cpp(27,41): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\Unit.cpp(28,42): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\Unit.cpp(39,49): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\Unit.cpp(40,49): warning C4244: '=' : conversion de 'int' en 'float', perte possible de données
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\Unit.cpp(294,44): warning C4244: 'argument' : conversion de 'float' en 'int', perte possible de données
+C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\RTS\Unit.cpp(294,22): warning C4244: 'argument' : conversion de 'float' en 'int', perte possible de données
+  Génération de code en cours...
   RTS.vcxproj -> C:\Users\bapti\OneDrive\Documents\Travail\PLA_RTS\RTS\x64\Debug\RTS.exe

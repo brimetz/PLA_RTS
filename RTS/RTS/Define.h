@@ -1,0 +1,10 @@
+#pragma once
+
+#define SCREENWIDTH 800
+#define SCREENHEIGHT 450
+
+#define CURSORRADIUS 20
+#define MAX_RESTART_PATH 4
+
+#define SIZEMAP 10
+#define SIZECASE 100
